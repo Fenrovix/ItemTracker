@@ -1,0 +1,3 @@
+[submodule "ItemTracker/OtterGui"]
+	path = ItemTracker/OtterGui
+	url = https://github.com/Ottermandias/OtterGui.git

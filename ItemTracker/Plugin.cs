@@ -4,19 +4,19 @@ using Dalamud.Plugin;
 using System.IO;
 using Dalamud.Interface.Windowing;
 using Dalamud.Plugin.Services;
-using SamplePlugin.Windows;
+using ItemTracker.Windows;
 
-namespace SamplePlugin
+namespace ItemTracker
 {
     public sealed class Plugin : IDalamudPlugin
     {
-        public string Name => "Sample Plugin";
-        private const string CommandName = "/pmycommand";
+        public string Name => "Item Tracker";
+        private readonly string[] CommandName = {"/it", "/itemtracker"};
 
         private DalamudPluginInterface PluginInterface { get; init; }
         private ICommandManager CommandManager { get; init; }
         public Configuration Configuration { get; init; }
-        public WindowSystem WindowSystem = new("SamplePlugin");
+        public WindowSystem WindowSystem = new("ItemTracker");
 
         private ConfigWindow ConfigWindow { get; init; }
         private MainWindow MainWindow { get; init; }
@@ -41,10 +41,11 @@ namespace SamplePlugin
             WindowSystem.AddWindow(ConfigWindow);
             WindowSystem.AddWindow(MainWindow);
 
-            this.CommandManager.AddHandler(CommandName, new CommandInfo(OnCommand)
-            {
-                HelpMessage = "A useful message to display in /xlhelp"
-            });
+            foreach(var command in CommandName)
+                this.CommandManager.AddHandler(command, new CommandInfo(OnCommand)
+                {
+                    HelpMessage = "A useful message to display in /xlhelp"
+                });
 
             this.PluginInterface.UiBuilder.Draw += DrawUI;
             this.PluginInterface.UiBuilder.OpenConfigUi += DrawConfigUI;
@@ -57,7 +58,8 @@ namespace SamplePlugin
             ConfigWindow.Dispose();
             MainWindow.Dispose();
             
-            this.CommandManager.RemoveHandler(CommandName);
+            foreach(var command in CommandName)
+                this.CommandManager.RemoveHandler(command);
         }
 
         private void OnCommand(string command, string args)

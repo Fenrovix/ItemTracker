@@ -1,0 +1,15 @@
+{
+  "Author": "Fenrovix",
+  "Name": "Item Tracker",
+  "Punchline": "Track em items",
+  "Description": "Track your items in lists. /it or /itemtracker",
+  "InternalName": "ItemTracker",
+  "ApplicableVersion": "any",
+  "Tags": [
+    "Item",
+    "plugin",
+    "Tracker", 
+    "Fenrovix", 
+    "List"
+  ]
+}
