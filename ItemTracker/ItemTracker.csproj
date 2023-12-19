@@ -21,6 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Dalamud.DrunkenToad" Version="1.8.15" />
     <PackageReference Include="Serilog" Version="3.1.2-dev-02097" />
   </ItemGroup>
 </Project>

@@ -4,6 +4,9 @@ using Dalamud.Plugin;
 using System.IO;
 using Dalamud.Interface.Windowing;
 using Dalamud.Plugin.Services;
+using FFXIVClientStructs.FFXIV.Client.UI.Agent;
+using ItemTracker.Managers;
+using ItemTracker.Universalis;
 using ItemTracker.Windows;
 
 namespace ItemTracker
@@ -20,6 +23,23 @@ namespace ItemTracker
 
         private ConfigWindow ConfigWindow { get; init; }
         private MainWindow MainWindow { get; init; }
+        
+        [PluginService]
+        [RequiredVersion("1.0")]
+        public static IGameGui GameGui { get; private set; } = null!;
+
+        [PluginService]
+        [RequiredVersion("1.0")]
+        public static IChatGui ChatGui { get; private set; } = null!;
+        
+        [PluginService]
+        [RequiredVersion("1.0")]
+        public static IDataManager DataManager { get; private set; } = null!;
+        
+        [PluginService]
+        [RequiredVersion("1.0")]
+        public static IClientState ClientState { get; private set; } = null!;
+        public static HoverManager HoverManager { get; private set; } = null!;
 
         public Plugin(
             [RequiredVersion("1.0")] DalamudPluginInterface pluginInterface,
@@ -41,6 +61,7 @@ namespace ItemTracker
             WindowSystem.AddWindow(ConfigWindow);
             WindowSystem.AddWindow(MainWindow);
 
+            HoverManager = new HoverManager(this);
             foreach(var command in CommandName)
                 this.CommandManager.AddHandler(command, new CommandInfo(OnCommand)
                 {
