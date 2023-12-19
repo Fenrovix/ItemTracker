@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Numerics;
 using Dalamud.Game.Text;
 using Dalamud.Interface.Internal;
@@ -51,12 +52,16 @@ public class MainWindow : Window, IDisposable
     private uint currentItem;
     private string text = "Search";
     private bool searchMode = true;
+
+    private string searchString = "";
+    private int index;
     public override void Draw()
     {
         // Search input field
-        
+        ImGui.Text(searchString);
         if (ImGui.InputText(text, currentSearch, 100))
         {
+            UpdateSearchString();
             textChanged = true;
             searchMode = true;
             UpdateSearchResults();
@@ -111,16 +116,32 @@ public class MainWindow : Window, IDisposable
     
     private void UpdateSearchResults()
     {
-        string searchString = System.Text.Encoding.UTF8.GetString(currentSearch).TrimEnd('\0');
+        
         if (string.IsNullOrWhiteSpace(searchString))
         {
             searchResults.Clear();
             return;
         }
 
-        searchResults = itemsId.Keys
-                               .Where(name => name.ToString().IndexOf(searchString, StringComparison.OrdinalIgnoreCase) >= 0)
-                               .ToList();
+        searchResults.Clear(); // Clear existing results
+        foreach (var itemName in itemsId.Keys)
+        {
+            if (itemName.ToString().Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            {
+                searchResults.Add(itemName);
+            }
+        }
+    }
+    private void UpdateSearchString()
+    {
+        int nullIndex = Array.IndexOf(currentSearch, (byte)0);
+        if (nullIndex != -1)
+        {
+            // Zero out the rest of the array from the first null byte
+            Array.Clear(currentSearch, nullIndex + 1, currentSearch.Length - nullIndex - 1);
+        }
+
+        searchString = Encoding.UTF8.GetString(currentSearch).TrimEnd('\0');
     }
 
     public Dictionary<SeString, uint> CreateItemDictionary()
