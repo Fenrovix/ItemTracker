@@ -1,3 +1,15 @@
 [submodule "ItemTracker/OtterGui"]
 	path = ItemTracker/OtterGui
 	url = https://github.com/Ottermandias/OtterGui.git
+[submodule "CriticalCommonLib"]
+	path = CriticalCommonLib
+	url = https://github.com/Critical-Impact/CriticalCommonLib.git
+[submodule "ItemTracker/CriticalCommonLib"]
+	path = ItemTracker/CriticalCommonLib
+	url = https://github.com/Critical-Impact/CriticalCommonLib.git
+[submodule "ItemTracker/LuminaSupplemental"]
+	path = ItemTracker/LuminaSupplemental
+	url = https://github.com/Critical-Impact/LuminaSupplemental.git
+[submodule "ItemTracker/DalaMock"]
+	path = ItemTracker/DalaMock
+	url = https://github.com/Critical-Impact/DalaMock.git

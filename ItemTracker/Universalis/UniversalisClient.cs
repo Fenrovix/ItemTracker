@@ -1,44 +1,43 @@
 ﻿using System.Net.Http;
+using Lumina.Excel.GeneratedSheets2;
 using Newtonsoft.Json;
 
 namespace ItemTracker.Universalis;
 
 public class UniversalisClient
 {
-    private readonly HttpClient httpClient = new();
-    private const string BaseUrl = "https://universalis.app/api/v2/";
-
-    private string dataCenter = null!;
-    private uint currentServer; 
-
-    private bool created;
+    private readonly HttpClient httpClient;
+    private readonly string dataCenter;
+    public UniversalisClient(string dataCenter)
+    {
+        httpClient = new HttpClient();
+        this.dataCenter = dataCenter;
+    }
     
-    public async Task CreateAsync()
+    public async Task<MarketData?> GetMarketBoardDataAsync(Item item)
     {
-        currentServer = Plugin.ClientState.LocalPlayer!.CurrentWorld.Id;
-        var dcs = await GetDatacenters();
+        try
+        {
+            var response = await httpClient.GetAsync($"https://universalis.app/api/{dataCenter}/{item.RowId}");
+            if (!response.IsSuccessStatusCode)
+            {
+                // Handle non-success status code
+                return null;
+            }
 
-        foreach (var dc in dcs!.Where(dc => dc.Worlds.Contains(currentServer)))
-            dataCenter = dc.Name;
-        
-        created = true;
-    }
-
-    private async Task<List<Datacenter>?> GetDatacenters()
-    {
-        var dcJson = await httpClient.GetStringAsync(BaseUrl + "data-centers");
-        var dcs = JsonConvert.DeserializeObject<List<Datacenter>>(dcJson);
-        return dcs;
-    }
-
-    public async Task<MarketData?> GetDatacenterListings(uint itemId)
-    {
-        if (!created) await CreateAsync();
-        var marketDataJson = await httpClient.GetStringAsync($"{BaseUrl}/{dataCenter}/{itemId}");
-        var marketData = JsonConvert.DeserializeObject<MarketData>(marketDataJson);
-        return marketData;
+            var content = await response.Content.ReadAsStringAsync();
+            var marketData = JsonConvert.DeserializeObject<MarketData>(content);
+            marketData!.Item = item;
+            return marketData;
+        }
+        catch (Exception ex)
+        {
+            Plugin.ChatGui.PrintError($"{ex}");
+            return null;
+        }
     }
 }
+
 
 public class World
 {
@@ -57,13 +56,7 @@ public class Datacenter
 
 public class MarketData
 {
+    public Item Item;
     [JsonProperty("listings")] public Listing[] Listings { get; set; } = null!;
 }
 
-public class Listing
-{
-    [JsonProperty("worldName")] public string WorldName { get; set; } = null!;
-    [JsonProperty("quantity")] public int Quantity { get; set; }
-    [JsonProperty("pricePerUnit")] public int Price { get; set; }
-    [JsonProperty("hq")] public bool HQ { get; set; }
-}
